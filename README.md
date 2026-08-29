@@ -4,18 +4,6 @@ Système de suivi nutritionnel et d'entraînement piloté par la donnée, constr
 
 L'objectif n'est pas de compter les calories. C'est de **rendre observables les modes de défaillance** d'une alimentation réelle — famille de quatre au dîner, produits de saison, jeûne intermittent, charge d'entraînement de coureur — pour que la correction devienne un réflexe et non une décision.
 
-## Contexte d'usage
-
-| Paramètre | Valeur |
-| --- | --- |
-| Volume de course | ~70 km/semaine, ~10 km/jour |
-| Objectif | Semi-marathon, 15 novembre 2026 |
-| Structure hebdo | Qualité lundi & mercredi, sortie longue samedi, repos jeudi |
-| Convives | 4 au dîner en semaine ; midi libre |
-| Protocole | Jeûne 16:8, fenêtre alimentaire décalée, levée les jours de sortie longue |
-| Contrainte produit | Fruits et légumes de saison, origine France |
-
-La perte de poids n'est pas un objectif piloté : c'est une conséquence attendue d'une structure alimentaire correcte.
 
 ## Principes du modèle nutritionnel
 
