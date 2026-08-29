@@ -1,60 +1,54 @@
-# suivinutrition
+# SuiviNutrition
 
-Système de suivi nutritionnel et d'entraînement piloté par la donnée, construit sur Notion.
+Spécification d'un système de suivi nutritionnel et d'entraînement piloté par la
+donnée, conçu pour être **instancié par d'autres**.
 
-L'objectif n'est pas de compter les calories. C'est de **rendre observables les modes de défaillance** d'une alimentation réelle — famille de quatre au dîner, produits de saison, jeûne intermittent, charge d'entraînement de coureur — pour que la correction devienne un réflexe et non une décision.
+L'objectif n'est pas de compter les calories. C'est de rendre observables les
+modes de défaillance d'une alimentation réelle — table partagée, produits de
+saison, jeûne intermittent, charge d'entraînement — pour que la correction
+devienne un réflexe et non une décision.
 
+## Nature de ce dépôt
 
-## Principes du modèle nutritionnel
-
-- **Cible calorique générative** : `2100 + 63 × km courus`. Pas de table de correspondance.
-- **Glucides en UG** (1 UG = 40 g de glucides). Les glucides se **placent**, ils ne se réduisent pas.
-- **Protéines** : 130–135 g/jour, seuil de 30 g par prise pour déclencher la synthèse.
-- **Lipides** : plafond 55–60 g/jour, 15 g par prise, **un seul véhicule lipidique par repas**. Les lipides sont le levier du déficit, pas l'ennemi — le vrai mode de défaillance, ce sont les lipides invisibles (huiles, sauces).
-- **Protocole double canal** : la photo capture les solides, la déclaration verbale capture les liquides gras. Une photo seule ne détecte pas une cuillère d'huile.
-
-## Architecture
-
-Quatre bases Notion, chaînées par relations et rollups :
+Ce dépôt contient **la structure de l'outil, jamais les données**. Les données
+d'une instance — prises, journal, mesures — restent dans son support de
+stockage. Le dépôt est public et ne contient aucun identifiant d'instance.
 
 ```
-🍽️ Ingrédients / Recettes / Prises libres
-        │  (relations n..n)
-        ▼
-   ⌚ Événement de prise alimentaire     ← 15 rollups Σ, 5 formules d'agrégation
-        │  (relation n..1)
-        ▼
-   🌞 Jour                                ← rollups de totaux + écart à la cible
-        │
-        ▼
-   🗞️ Journal                             ← narratif, contexte, ressenti
+Aliment ── LignePrise ── Prise ── Jour ── EntreeJournal
+   référentiel   quantité   événement   bilan   narratif
 ```
 
-Deux pages de référence portent le modèle lui-même : **⚙️ Modèle Nutrition — noyau génératif** et **📐 Annexes de conversion**.
+## Documents
 
-Le système est en usage quotidien. Le journal narratif n'est pas un accessoire : toute analyse doit s'appuyer sur ses entrées, c'est lui qui rend le modèle adaptable au contexte réel.
+| Document | Portée |
+|---|---|
+| [`docs/modele-domaine.md`](docs/modele-domaine.md) | Entités, cardinalités, chaîne de calcul, cibles et seuils. **Portable.** |
+| [`docs/protocole-saisie.md`](docs/protocole-saisie.md) | Double canal, unités, placement, modes de défaillance. **Portable.** |
+| [`docs/adaptateur-notion.md`](docs/adaptateur-notion.md) | Implémentation de référence et ses contournements. **Contingent.** |
+| [`config/parametres-defaut.yaml`](config/parametres-defaut.yaml) | Toutes les valeurs numériques normatives. Surchargeables. |
+| [`CLAUDE.md`](CLAUDE.md) | Règles de travail dans le dépôt. |
 
-## Documentation
+Lire les deux premiers pour comprendre le système. Le troisième n'est utile que
+pour reconstruire l'instance Notion : sur un autre support, il est ignorable en
+totalité.
 
-- [`docs/modele-donnees.md`](docs/modele-donnees.md) — exigences, cardinalités, unités de saisie, chaîne de calcul, contraintes techniques de l'API Notion, évolutions différées.
+## Instancier
 
-## Règles de travail
-
-- **Tester avant d'optimiser** : valider dans une colonne `ZZ test` avant de toucher une colonne de production.
-- **Chercher avant de créer** : interroger la base sur plusieurs formats de titre avant de créer une page. Absence dans la recherche ≠ absence en base.
-- **Minimalisme de schéma** : ne conserver que les colonnes non dérivables. Préférer une structure générative à une table de correspondance.
-- **Propagation ascendante** : corriger les prises, puis les événements, puis le jour.
-- Les totaux du jour se lisent dans les rollups. Jamais par addition manuelle.
-
-## Conventions
-
-- Pages Jour : `AAMMJJ` (ex. `260827`)
-- Pages Événement : `AAMMJJHHMM`
-- Portions à la main : 🫴 = 1 UG (féculents) · ✊ = légume · 👍 ≈ 5 g de lipides · ✋ = protéines
-- Types de jour : 🔵 repos · 🟢 footing · 🟡 qualité · 🔴 course / sortie longue
+1. Copier `config/parametres-defaut.yaml` et **redéfinir toutes les valeurs**.
+   Celles fournies décrivent une configuration individuelle, pas une
+   recommandation.
+2. Implémenter les entités de `docs/modele-domaine.md`, jonction comprise.
+3. Appliquer `docs/protocole-saisie.md` — le canal déclaratif n'est pas
+   optionnel.
 
 ## Feuille de route
 
-- [ ] Confirmer le pattern de recharge glycogénique observé le 26/08 sur les prochaines séances de qualité
-- [ ] Migration vers une table de jonction `Ligne de prise` portant la quantité (voir §6 du modèle de données)
-- [ ] Validation multi-utilisateurs sur un petit groupe test — après le 15 novembre
+- [ ] Migration vers la table de jonction `LignePrise`
+- [ ] Externalisation des seuils hors des formules de l'instance de référence
+- [ ] Validation multi-utilisateurs sur un groupe test restreint
+
+## Avertissement
+
+Instrument d'observation personnel. Ne produit pas de diagnostic et ne remplace
+pas un suivi médical ou diététique.

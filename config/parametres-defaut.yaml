@@ -1,0 +1,125 @@
+# parametres-defaut.yaml
+#
+# Paramètres du noyau génératif. Surchargeables par instance.
+#
+# Ce fichier contient TOUTES les valeurs numériques normatives du système.
+# Aucun document Markdown ne doit en dupliquer une seule : les documents
+# référencent les clés par leur nom.
+#
+# AVERTISSEMENT. Ces valeurs décrivent une configuration individuelle documentée
+# (homme adulte, coureur d'endurance, sans pathologie connue). Elles ne
+# constituent pas une recommandation. Toute nouvelle instance doit les
+# redéfinir, avec un professionnel de santé lorsque le contexte l'exige.
+
+version: 1
+
+# --- Profil ------------------------------------------------------------------
+# Décrit le contexte d'application des paramètres, sans identifier personne.
+profil:
+  contexte: coureur_endurance_adulte
+  charge_hebdomadaire_km: 72
+  jours_qualite_par_semaine: 2
+  sortie_longue_par_semaine: 1
+
+# --- Énergie -----------------------------------------------------------------
+# Cible générative. Aucune table de correspondance.
+#   cible_kcal = base + coefficient_par_km × km_courus
+energie:
+  base: 2100
+  coefficient_par_km: 63
+  unite: kcal
+  # Le déficit n'est pas un paramètre global : il se module par type de jour.
+  # Le levier du déficit est lipidique, jamais glucidique.
+  levier_deficit: lipides
+
+# --- Protéines ---------------------------------------------------------------
+proteines:
+  cible_journaliere:
+    min: 130
+    max: 135
+    unite: g
+  # Plancher PAR PRISE. En deçà, l'apport ne déclenche pas la synthèse.
+  # Évalué par prise, jamais sur le total du jour.
+  seuil_synthese_par_prise:
+    valeur: 30
+    unite: g
+
+# --- Lipides -----------------------------------------------------------------
+lipides:
+  plafond_journalier:
+    min: 55
+    max: 60
+    unite: g
+  plafond_par_prise:
+    valeur: 15
+    unite: g
+  # Un aliment dépassant ce seuil est classé « véhicule lipidique ».
+  seuil_vehicule:
+    valeur: 3
+    unite: g
+  vehicules_max_par_prise: 1
+
+# --- Glucides ----------------------------------------------------------------
+glucides:
+  # Unité de compte permettant la saisie sans balance.
+  grammes_par_ug: 40
+  # Les glucides ne se réduisent pas : ils occupent le solde énergétique une
+  # fois protéines et lipides alloués, et suivent donc la charge du jour.
+  # Seule leur RÉPARTITION TEMPORELLE est un paramètre de pilotage.
+  mode_determination: solde_energetique
+  placement:
+    charge_pre_seance: true
+    recharge_post_seance: true
+
+# --- Portions à la main ------------------------------------------------------
+portions:
+  main_en_coupe_ug: 1.0      # féculents — mesure le volume total du plat
+  pouce_lipides_g: 5
+  facteurs_conversion:
+    legumineuses: 0.70       # rapport à la main en coupe de référence
+
+# --- Jeûne intermittent ------------------------------------------------------
+jeune:
+  fenetre_alimentation_h: 8
+  fenetre_jeune_h: 16
+  # Le jeûne matinal est la forme retenue.
+  ancrage: matin
+  # Levé sur les jours à charge élevée : la fenêtre ne doit jamais compromettre
+  # la disponibilité énergétique d'une sortie longue.
+  applique_si_charge_glucidique: basse
+  leve_sur_types_de_jour:
+    - sortie_longue
+    - course
+
+# --- Types de jour -----------------------------------------------------------
+types_de_jour:
+  repos:          { code: "🔵" }
+  footing:        { code: "🟢" }
+  qualite:        { code: "🟡" }
+  sortie_longue:  { code: "🔴" }
+  course:         { code: "🔴" }
+
+# --- Créneaux de prise -------------------------------------------------------
+# Le créneau de collation est une prise planifiée, pas une option : le sauter
+# produit une compensation en soirée.
+creneaux:
+  collation_apres_midi:
+    planifie: true
+    critique: true
+
+# --- Contexte de table -------------------------------------------------------
+# Le dîner est partagé. Le plat commun n'est pas dimensionné sur les cibles du
+# porteur du suivi : c'est la portion individuelle qui est pilotée.
+table:
+  convives_diner_moyen: 4
+  repas_partages:
+    - diner
+  # Le système ne modélise pas les apports des autres convives.
+  suivi_autres_convives: false
+
+# --- Approvisionnement -------------------------------------------------------
+# Critère de sélection en amont, jamais de contrainte de validation.
+approvisionnement:
+  preference_saison: true
+  preference_locale: true
+  mode_application: suggestion
