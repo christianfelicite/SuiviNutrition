@@ -1,0 +1,24 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Installer yamllint
+        run: pip install yamllint
+
+      - name: Valider config/parametres-defaut.yaml
+        run: yamllint config/parametres-defaut.yaml
+
+      - name: Vérifier les liens internes des .md
+        run: python3 scripts/check-links.py

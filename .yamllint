@@ -1,0 +1,10 @@
+extends: default
+
+rules:
+  line-length:
+    max: 100
+  document-start: disable
+  colons:
+    max-spaces-after: -1
+  braces:
+    max-spaces-inside: -1
