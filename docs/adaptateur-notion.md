@@ -13,10 +13,16 @@
 
 | Entité de domaine | Réalisation Notion | Écart |
 |---|---|---|
-| `Aliment` | base des contenus | **fusionnée avec `LignePrise`** — voir §5 |
-| `LignePrise` | *absente* | quantité portée par l'enregistrement de contenu |
+| `Ingredient` | base des aliments, en référentiel | conforme |
+| `Recette` | base des recettes | composition saisie — §6, écart 7 |
+| `ComposantRecette` | *absente* | une base de compositions de référence fait foi pour les macros d'une recette, sans quantité par ingrédient — §6, écart 7 |
+| `LignePrise` | base des prises alimentaires | jonction réalisée — voir §5 ; exclusivité des sources non contrainte — §6, écart 5 |
 | `Prise` | base des événements | conforme |
-| `Jour` | base des jours | conforme |
+| `Seance` | base des entraînements | la séance planifiée porte aussi le type de jour |
+| `TypeDeJour` | attribut de la séance planifiée | pas de base dédiée |
+| `Jour` | base des jours | cible recalculée localement — §6, écart 1 |
+| `Semaine` | base des semaines | — |
+| `Cible` | base des cibles du modèle | lue par `Jour` |
 | `EntreeJournal` | base du journal | conforme |
 
 ## 2. Contournements structurels
@@ -101,20 +107,17 @@ identifiants n'ont aucune valeur pour une autre instanciation.
 
 Une instance se reconstruit à partir de ce document ; elle ne se clone pas.
 
-## 5. Dette identifiée : table de jonction
+## 5. Jonction `LignePrise`
 
-L'instance actuelle fusionne `Aliment` et `LignePrise`. Conséquence : la
-composition d'un aliment est ressaisie à chaque consommation, ce qui rend
-impossible toute correction rétroactive d'une valeur de composition.
+La base des prises alimentaires réalise la jonction : chaque enregistrement
+référence un ingrédient ou une recette du référentiel, porte la quantité
+consommée, et calcule ses valeurs à partir de la composition de la source.
 
-**Cible :** table `Aliment` en référentiel, table de jonction `LignePrise`
-portant la quantité.
+Elle conserve aussi des champs de composition saisis directement, hérités de
+l'époque où contenu et quantité étaient fusionnés.
 
-**Statut :** différée. Motif : coût de migration des données existantes pendant
-une période de suivi actif — pas un doute sur le design.
-
-**Conséquence pour une nouvelle instance :** implémenter directement la
-jonction. Ne pas reproduire ce compromis.
+**Conséquence pour une nouvelle instance :** implémenter la jonction sans ces
+champs. Une composition saisie relève de `PriseLibre`, pas de `LignePrise`.
 
 ## 6. Écarts avec le modèle de domaine
 
@@ -132,9 +135,3 @@ résorption se suit dans une issue.
 | 6 | `Jour.distance_courue` est saisie alors que le modèle la dérive de `Seance`. | Elle doit **rester saisie** tant que `Seance` n'est pas peuplée. Bascule en une fois, jamais en double. | issue #10 |
 | 7 | `ComposantRecette` n'existe pas en tant que jonction ; `Recette` porte une composition saisie au lieu d'être dérivée (domaine §4.3, §4.4). | Une correction d'ingrédient ne se propage pas aux recettes. | issue #11 |
 | 8 | `frequence_cardiaque_moyenne` n'a pas d'historique. | Le signal d'arrêt n°2 reste indisponible tant que `pilotage.fenetre_tendance` semaines ne sont pas accumulées. | Délai, pas défaut : aucune action. |
-
-## 7. Feuille de route
-
-- [ ] Migration vers la table de jonction (§5)
-- [ ] Externalisation des seuils hors des formules (§2.8)
-- [ ] Validation multi-utilisateurs sur un groupe test restreint
