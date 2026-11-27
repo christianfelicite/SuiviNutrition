@@ -81,9 +81,6 @@ modification de `config/parametres-defaut.yaml` doit être **répercutée
 manuellement** dans les formules concernées. Il n'existe pas de mécanisme de
 propagation.
 
-C'est l'écart le plus coûteux entre la spécification et l'implémentation de
-référence.
-
 ## 3. Règles opératoires
 
 - **Chercher avant de créer.** Interroger la base sur plusieurs formats de titre
