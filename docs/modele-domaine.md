@@ -320,7 +320,7 @@ Unité de bilan.
 | `axe_hydrique` | enum(diluer, neutre, concentrer) | — | 0..1 | S | Axe **eau**, orthogonal au précédent. Deux axes, deux attributs, jamais fusionnés. |
 | `mode` | enum(deficit, maintien) | — | 1..1 | S | Le mode se change **ici et nulle part ailleurs**. |
 | `seances` | ref(Seance) | — | 0..n | R | — |
-| `distance_courue` | decimal | km | 1..1 | **D** | Σ des séances. **Devient dérivée** avec l'intégration de `Seance` — cf. §11, écart n°6. |
+| `distance_courue` | decimal | km | 1..1 | **D** | Σ des séances. **Devient dérivée** avec l'intégration de `Seance` — cf. [`adaptateur-notion.md`](adaptateur-notion.md), §6. |
 | `poids_du_matin` | decimal | kg | 0..1 | S | Signal d'arrêt n°1 du déficit. |
 | `sommeil` | enum(bon, moyen, mauvais) | — | 0..1 | S | Signal d'arrêt n°3. |
 | `jeune_applique` | booleen | — | 1..1 | S | Faux si le dîner de la veille était insuffisamment chargé pour une séance à jeun. Décision **prise la veille au soir**. |
@@ -558,21 +558,12 @@ une observation, mais comme une observation partielle.
 
 ---
 
-## 11. Écarts connus entre ce modèle et l'instance de référence
+## 11. Écarts avec l'instance de référence
 
-Section vivante. Un écart non documenté devient une règle tacite.
-
-| # | Écart | Statut |
-| - | ----- | ------ |
-| 1 | La cible est recalculée localement au niveau `Jour` en plus d'être lue dans `Cible`. Deux chemins coexistent (§4.11). | Ouvert — le seul écart réellement coûteux. |
-| 2 | Les seuils sont codés en dur dans la formule d'évaluation au lieu d'être lus depuis leur définition (§7). | Ouvert. |
-| 3 | `vehicule_lipidique` n'est pas renseigné sur l'ensemble du référentiel. Tant qu'il est incomplet, `nb_vehicules_lipidiques` sous-compte **sans le signaler**. | Ouvert — backfill. |
-| 4 | `mode`, `cible`, `axe_hydrique` non renseignés sur les jours antérieurs à leur création. | Ouvert — backfill ou application aux jours à venir seulement. |
-| 5 | L'exclusivité des trois canaux (§3.4) n'est pas contrainte techniquement : rien n'empêche une ligne de référencer deux sources. | Ouvert — contrôle à ajouter. |
-| 6 | `Jour.distance_courue` est saisie alors que le modèle la rend dérivée de `Seance`. Tant que `Seance` n'est pas peuplée, elle doit **rester saisie**. Bascule en une fois, jamais en double. | Ouvert. |
-| 7 | `Recette` porte une composition saisie au lieu d'être dérivée de `ComposantRecette` (§4.4). Tant que c'est le cas, une correction d'ingrédient ne se propage pas. | Ouvert. |
-| 8 | `ComposantRecette` n'existe pas en tant que jonction : les quantités de définition sont portées directement par la recette. | Ouvert. |
-| 9 | `frequence_cardiaque_moyenne` sans historique : le signal d'arrêt n°2 reste indisponible tant que `pilotage.fenetre_tendance` semaines ne sont pas accumulées. | Délai, pas défaut. |
+Un écart non documenté devient une règle tacite. Les écarts entre ce modèle et
+l'instance de référence relèvent du support : ils sont documentés dans
+[`adaptateur-notion.md`](adaptateur-notion.md), §6, et leur résorption est
+suivie par des issues.
 
 ---
 

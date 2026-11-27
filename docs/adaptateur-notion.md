@@ -81,9 +81,6 @@ modification de `config/parametres-defaut.yaml` doit être **répercutée
 manuellement** dans les formules concernées. Il n'existe pas de mécanisme de
 propagation.
 
-C'est l'écart le plus coûteux entre la spécification et l'implémentation de
-référence.
-
 ## 3. Règles opératoires
 
 - **Chercher avant de créer.** Interroger la base sur plusieurs formats de titre
@@ -119,7 +116,24 @@ une période de suivi actif — pas un doute sur le design.
 **Conséquence pour une nouvelle instance :** implémenter directement la
 jonction. Ne pas reproduire ce compromis.
 
-## 6. Feuille de route
+## 6. Écarts avec le modèle de domaine
+
+Ce que l'instance de référence ne réalise pas encore comme le prévoit
+[`modele-domaine.md`](modele-domaine.md). Un écart se documente ici ; sa
+résorption se suit dans une issue.
+
+| # | Écart | Conséquence | Suivi |
+|---|---|---|---|
+| 1 | La cible est recalculée localement au niveau `Jour` en plus d'être lue dans `Cible` (domaine §4.11). | Deux chemins de calcul coexistent et peuvent diverger. | issue #6 |
+| 2 | Les seuils sont codés en dur dans les formules d'évaluation. | Voir §2.8. | issue #2 |
+| 3 | `vehicule_lipidique` n'est pas renseigné sur l'ensemble du référentiel. | `nb_vehicules_lipidiques` sous-compte **sans le signaler**. | issue #7 |
+| 4 | `mode`, `cible` et `axe_hydrique` ne sont pas renseignés sur les jours antérieurs à leur création. | Agrégats incomplets sur la période de bascule. | issue #8 |
+| 5 | L'exclusivité des trois canaux (domaine §3.4) n'est pas contrainte. | Une ligne peut référencer deux sources. | issue #9 |
+| 6 | `Jour.distance_courue` est saisie alors que le modèle la dérive de `Seance`. | Elle doit **rester saisie** tant que `Seance` n'est pas peuplée. Bascule en une fois, jamais en double. | issue #10 |
+| 7 | `ComposantRecette` n'existe pas en tant que jonction ; `Recette` porte une composition saisie au lieu d'être dérivée (domaine §4.3, §4.4). | Une correction d'ingrédient ne se propage pas aux recettes. | issue #11 |
+| 8 | `frequence_cardiaque_moyenne` n'a pas d'historique. | Le signal d'arrêt n°2 reste indisponible tant que `pilotage.fenetre_tendance` semaines ne sont pas accumulées. | Délai, pas défaut : aucune action. |
+
+## 7. Feuille de route
 
 - [ ] Migration vers la table de jonction (§5)
 - [ ] Externalisation des seuils hors des formules (§2.8)
