@@ -15,8 +15,9 @@ d'une instance — prises, journal, mesures — restent dans son support de
 stockage. Le dépôt est public et ne contient aucun identifiant d'instance.
 
 ```
-Aliment ── LignePrise ── Prise ── Jour ── EntreeJournal
-   référentiel   quantité   événement   bilan   narratif
+Ingredient ─┐
+Recette    ─┼─ LignePrise ── Prise ──── Jour ── Semaine
+PriseLibre ─┘   quantité     événement  bilan   tendance
 ```
 
 ## Documents
@@ -44,9 +45,7 @@ totalité.
 
 ## Feuille de route
 
-- [ ] Migration vers la table de jonction `LignePrise`
-- [ ] Externalisation des seuils hors des formules de l'instance de référence
-- [ ] Validation multi-utilisateurs sur un groupe test restreint
+Suivie dans les issues du dépôt, pas dans les documents.
 
 ## Avertissement
 
